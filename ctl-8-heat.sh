@@ -1,16 +1,17 @@
 #!/bin/bash -ex
 #
 source config.cfg
-source admin-openrc
 source functions.sh
 
 echocolor "Create DB for HEAT"
+sleep 5
 cat << EOF | mysql -uroot -p$MYSQL_PASS
 CREATE DATABASE heat;
 GRANT ALL PRIVILEGES ON heat.* TO 'heat'@'localhost' IDENTIFIED BY '$HEAT_DBPASS';
 GRANT ALL PRIVILEGES ON heat.* TO 'heat'@'%' IDENTIFIED BY '$HEAT_DBPASS';
 FLUSH PRIVILEGES;
 EOF
+
 sleep 5
 
 echocolor "Create user, role and endpoint for HEAT"
