@@ -12,7 +12,7 @@ sleep 5
 echocolor "Upgrade the packages for server"
 apt-get -y update && apt-get -y upgrade && apt-get -y dist-upgrade
 
-echocolor "Configuring hostname for $HOST_CIN node"
+echocolor "Configuring hostname for CINDER node"
 sleep 3
 echo "$HOST_CIN" > /etc/hostname
 hostname -F /etc/hostname
@@ -26,7 +26,7 @@ cat << EOF >> $iphost
 $CTL_MGNT_IP    $HOST_CTL
 $COM1_MGNT_IP   $HOST_COM1
 $COM2_MGNT_IP   $HOST_COM2
-$CIN_MGNT_IP    $HOST_CIN
+$CIN_MGNT_IP   $HOST_CIN
 EOF
 
 sleep 3

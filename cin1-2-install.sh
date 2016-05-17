@@ -5,8 +5,7 @@ source config.cfg
 source functions.sh
 
 apt-get -y install python-pip
-pip install \
-    https://pypi.python.org/packages/source/c/crudini/crudini-0.7.tar.gz
+pip install https://pypi.python.org/packages/source/c/crudini/crudini-0.7.tar.gz
 
 #
 echocolor "Install CINDER"
