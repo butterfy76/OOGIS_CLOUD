@@ -3,7 +3,7 @@
 source config.cfg
 source functions.sh
 
-echocolor "Cai dat goi CRUDINI"
+echocolor "Install CRUDINI"
 sleep 3
 
 apt-get -y install python-pip
