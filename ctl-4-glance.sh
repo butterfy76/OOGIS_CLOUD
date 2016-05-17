@@ -15,7 +15,7 @@ EOF
 
 
 
-echocolor " Create user, endpoint for GLANCE"
+echocolor "Create user, endpoint for GLANCE"
 sleep 3
 
 source admin-openrc
