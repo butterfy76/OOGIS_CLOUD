@@ -23,7 +23,7 @@ FLUSH PRIVILEGES;
 EOF
 
 
-echocolor "Create  user, endpoint for NEUTRON"
+echocolor "Create user, endpoint for NEUTRON"
 sleep 5
 
 openstack user create neutron --domain default --password $NEUTRON_PASS
