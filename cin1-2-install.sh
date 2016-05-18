@@ -12,9 +12,9 @@ echocolor "Install CINDER"
 sleep 3
 apt-get install -y lvm2 cinder-volume python-mysqldb
 
-pvcreate /dev/sda
-vgcreate cinder-volumes /dev/sda
-sed  -r -i 's#(filter = )(\[ "a/\.\*/" \])#\1["a\/sda\/", "r/\.\*\/"]#g' \
+pvcreate /dev/sdb1
+vgcreate cinder-volumes /dev/sdb1
+sed  -r -i 's#(filter = )(\[ "a/\.\*/" \])#\1["a\/sdb\/", "r/\.\*\/"]#g' \
     /etc/lvm/lvm.conf
 
 cinder_ctl=/etc/cinder/cinder.conf
@@ -56,7 +56,7 @@ ops_edit $cinder_ctl oslo_concurrency lock_path /var/lib/cinder/tmp
 
 ## [lvm] section
 ops_edit $cinder_ctl lvm \
-    volume_driver inder.volume.drivers.lvm.LVMVolumeDriver
+    volume_driver cinder.volume.drivers.lvm.LVMVolumeDriver
 ops_edit $cinder_ctl lvm volume_group cinder-volumes
 ops_edit $cinder_ctl lvm iscsi_protocol iscsi
 ops_edit $cinder_ctl lvm iscsi_helper tgtadm
