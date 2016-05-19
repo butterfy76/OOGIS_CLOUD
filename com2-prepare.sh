@@ -92,7 +92,6 @@ ops_edit $nova_com keystone_authtoken password $NOVA_PASS
 ops_edit $nova_com vnc enabled True
 ops_edit $nova_com vnc vncserver_listen 0.0.0.0
 ops_edit $nova_com vnc vncserver_proxyclient_address \$my_ip
-ops_edit $nova_com vnc vncserver_proxyclient_address \$my_ip
 ops_edit $nova_com vnc \
 	novncproxy_base_url http://$CTL_EXT_IP:6080/vnc_auto.html
 	
@@ -126,7 +125,7 @@ rm /var/lib/nova/nova.sqlite
 echo "Install openvswitch-agent (neutron) on COMPUTE NODE"
 sleep 5
 
-apt-get -y install neutron-plugin-ml2 neutron-plugin-openvswitch-agent
+apt-get -y install neutron-plugin-openvswitch-agent
 
 echo "Config file neutron.conf"
 neutron_com=/etc/neutron/neutron.conf
@@ -160,39 +159,23 @@ ops_edit $neutron_com oslo_messaging_rabbit rabbit_userid openstack
 ops_edit $neutron_com oslo_messaging_rabbit rabbit_password $RABBIT_PASS
 
 
-echo "############ Configuring ml2_conf.ini ############"
+echocolor "Configuring openvswitch_agent"
 sleep 5
 ########
-ml2_com=/etc/neutron/plugins/ml2/ml2_conf.ini
-test -f $ml2_com.orig || cp $ml2_com $ml2_com.orig
+ovsfile=/etc/neutron/plugins/ml2/openvswitch_agent.ini
+test -f $ovsfile.orig || cp $ovsfile $ovsfile.orig
 
-## [ml2] section
-ops_edit $ml2_com ml2 type_drivers flat,vlan,gre,vxlan
-ops_edit $ml2_com ml2 tenant_network_types vlan,gre,vxlan
-ops_edit $ml2_com ml2 mechanism_drivers openvswitch,l2population
-ops_edit $ml2_com ml2 extension_drivers port_security
+# [agent] section
+ops_edit $ovsfile agent tunnel_types gre,vxlan
+ops_edit $ovsfile agent l2_population True
 
-## [ml2_type_gre] section
-ops_edit $ml2_com ml2_type_gre tunnel_id_ranges 100:200
 
-## [ml2_type_vxlan] section
-ops_edit $ml2_com ml2_type_vxlan vni_ranges 201:300
-
-## [securitygroup] section 
-ops_edit $ml2_com securitygroup enable_security_group True
-ops_edit $ml2_com securitygroup enable_ipset True
-ops_edit $ml2_com securitygroup firewall_driver \
-neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+## [securitygroup] section
+ops_edit $ovsfile securitygroup firewall_driver \
+     neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 
 ## [ovs] section
-ops_edit $ml2_com ovs local_ip $COM2_MGNT_IP
-ops_edit $ml2_com ovs enable_tunneling True
-
-## [agent] section
-ops_edit $ml2_com agent tunnel_types gre,vxlan
-ops_edit $ml2_com agent l2_population True
-ops_edit $ml2_com agent prevent_arp_spoofing True
-
+ops_edit $ovsfile ovs local_ip $COM2_MGNT_IP
 
 echocolor "Reset service nova-compute,openvswitch-agent"
 sleep 5

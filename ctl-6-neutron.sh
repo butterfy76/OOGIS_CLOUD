@@ -45,7 +45,7 @@ echocolor "Install NEUTRON node"
 sleep 5
 apt-get -y install neutron-server python-neutronclient neutron-plugin-ml2 \
 neutron-plugin-openvswitch-agent neutron-l3-agent neutron-dhcp-agent \
-neutron-metadata-agent
+neutron-metadata-agent ipset
 
 
 ######## Backup configuration NEUTRON.CONF ##################"
@@ -117,25 +117,33 @@ ops_edit $ml2_clt ml2 extension_drivers port_security
 ops_edit $ml2_clt ml2_type_flat flat_networks external
 
 ## [ml2_type_gre] section
-ops_edit $ml2_clt ml2_type_gre tunnel_id_ranges 100:200
+ops_edit $ml2_clt ml2_type_gre tunnel_id_ranges 300:400
 
 ## [ml2_type_vxlan] section
-ops_edit $ml2_clt ml2_type_vxlan vni_ranges 201:300
+# ops_edit $ml2_clt ml2_type_vxlan vni_ranges 201:300
 
 ## [securitygroup] section
-ops_edit $ml2_clt securitygroup enable_security_group True
-ops_edit $ml2_clt securitygroup enable_ipset True
+# ops_edit $ml2_clt securitygroup enable_security_group True
+# ops_edit $ml2_clt securitygroup enable_ipset True
 ops_edit $ml2_clt securitygroup firewall_driver \
 	neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 
-## [ovs] section
-ops_edit $ml2_clt ovs local_ip $CTL_MGNT_IP
-ops_edit $ml2_clt ovs bridge_mappings external:br-ex
+echocolor "Configuring openvswitch_agent"
+sleep 5
+ovsfile=/etc/neutron/plugins/ml2/openvswitch_agent.ini
+test -f $ovsfile.orig || cp $ovsfile $ovsfile.orig
 
-## [agent] section
-ops_edit $ml2_clt agent tunnel_types gre,vxlan
-ops_edit $ml2_clt agent l2_population True
-ops_edit $ml2_clt agent prevent_arp_spoofing True
+# [agent] section
+ops_edit $ovsfile agent tunnel_types gre
+ops_edit $ovsfile agent l2_population True
+
+# [ovs] section
+ops_edit $ovsfile ovs local_ip $CTL_MGNT_IP
+ops_edit $ovsfile ovs bridge_mappings external:br-ex
+
+# [securitygroup] section
+ops_edit $ovsfile securitygroup firewall_driver \
+    neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 
 
 echocolor "Configuring L3 AGENT"
