@@ -45,7 +45,7 @@ echocolor "Install NEUTRON node"
 sleep 5
 apt-get -y install neutron-server python-neutronclient neutron-plugin-ml2 \
 neutron-plugin-openvswitch-agent neutron-l3-agent neutron-dhcp-agent \
-neutron-metadata-agent ipset
+neutron-metadata-agent python-neutron ipset
 
 
 ######## Backup configuration NEUTRON.CONF ##################"
@@ -108,7 +108,7 @@ test -f $ml2_clt.orig || cp $ml2_clt $ml2_clt.orig
 
 ## [ml2] section
 ops_edit $ml2_clt ml2 type_drivers flat,vlan,vxlan,gre
-ops_edit $ml2_clt ml2 tenant_network_types vlan,gre,vxlan
+ops_edit $ml2_clt ml2 tenant_network_types flat,gre
 ops_edit $ml2_clt ml2 mechanism_drivers openvswitch,l2population
 ops_edit $ml2_clt ml2 extension_drivers port_security
 
@@ -127,6 +127,7 @@ ops_edit $ml2_clt ml2_type_gre tunnel_id_ranges 300:400
 # ops_edit $ml2_clt securitygroup enable_ipset True
 ops_edit $ml2_clt securitygroup firewall_driver \
 	neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+
 
 echocolor "Configuring openvswitch_agent"
 sleep 5
@@ -190,7 +191,7 @@ ops_edit $netmetadata DEFAULT metadata_proxy_shared_secret $METADATA_SECRET
 
 su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
   --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
-  
+
 echocolor "Restarting NOVA service"
 sleep 7 
 service nova-api restart
